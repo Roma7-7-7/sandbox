@@ -22,6 +22,6 @@
 # Go workspace file
 go.work
 
-*/vendor/
+*vendor/
 
 *.DS_Store

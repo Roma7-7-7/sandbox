@@ -21,7 +21,7 @@
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            max-width: 800px;
+            max-width: 1500px;
             width: 100%;
         }
 
@@ -244,17 +244,25 @@
                     <span class="operator">+</span>
                     <input type="text" class="number-input" id="single4" maxlength="1">
                     <span class="operator">=</span>
-                    <input type="text" class="number-input" id="result" maxlength="2">
+                    <input type="text" class="number-input" id="result_tens" maxlength="1">
+                    <input type="text" class="number-input" id="result_ones" maxlength="1">
                 </div>
 
                 <!-- Decomposition visual -->
                 <div class="decomposition-visual">
-                    <div style="font-size: 2em; margin: 20px 0;">/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\\</div>
-                    <div class="decomposition-line">
-                        <input type="text" class="number-input" id="decomp_tens" maxlength="1">
-                        <input type="text" class="number-input" id="decomp_ones" maxlength="1">
-                        <span style="margin: 0 40px; font-size: 1.5em;"></span>
-                        <input type="text" class="number-input" id="decomp_single" maxlength="1">
+                    <!-- Middle row: split lines -->
+                    <div style="font-size: 2em; margin: 15px 0; color: #666; text-align: left; font-family: monospace;">
+                        /&nbsp;\
+                    </div>
+                    <!-- Bottom row: decomposed parts -->
+                    <div class="decomposition-line" style="display: flex; justify-content: center; align-items: center; gap: 60px;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="text" class="number-input" id="decomp_tens" maxlength="1">
+                            <input type="text" class="number-input" id="decomp_zero" maxlength="1">
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <input type="text" class="number-input" id="decomp_single" maxlength="1">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -271,7 +279,7 @@
     <script>
         let currentProblem = {};
         
-        // Input navigation
+        // Input navigation with backspace support
         function setupInputNavigation() {
             const inputs = document.querySelectorAll('.number-input:not(.readonly)');
             inputs.forEach((input, index) => {
@@ -286,6 +294,18 @@
                         const nextInput = inputs[index + 1];
                         if (nextInput && !nextInput.readonly) {
                             nextInput.focus();
+                        }
+                    }
+                });
+
+                input.addEventListener('keydown', function(e) {
+                    // Handle backspace - move to previous input if current is empty
+                    if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                        const prevInput = inputs[index - 1];
+                        if (prevInput && !prevInput.readonly) {
+                            prevInput.focus();
+                            // Clear the previous input
+                            prevInput.value = '';
                         }
                     }
                 });
@@ -357,9 +377,10 @@
                 tens3: document.getElementById('tens3').value,
                 ones3: document.getElementById('ones3').value,
                 single4: document.getElementById('single4').value,
-                result: document.getElementById('result').value,
+                result_tens: document.getElementById('result_tens').value,
+                result_ones: document.getElementById('result_ones').value,
                 decomp_tens: document.getElementById('decomp_tens').value,
-                decomp_ones: document.getElementById('decomp_ones').value,
+                decomp_zero: document.getElementById('decomp_zero').value,
                 decomp_single: document.getElementById('decomp_single').value
             };
 
@@ -372,9 +393,10 @@
                 { id: 'tens3', expected: currentProblem.tens.toString(), description: 'final tens place' },
                 { id: 'ones3', expected: '0', description: 'final ones place (should be 0)' },
                 { id: 'single4', expected: (currentProblem.ones + currentProblem.single).toString(), description: 'sum of ones digits' },
-                { id: 'result', expected: currentProblem.result.toString(), description: 'final result' },
+                { id: 'result_tens', expected: currentProblem.resultTens.toString(), description: 'final result' },
+                { id: 'result_ones', expected: currentProblem.resultOnes, description: 'final result' },
                 { id: 'decomp_tens', expected: currentProblem.tens.toString(), description: 'decomposition tens' },
-                { id: 'decomp_ones', expected: '0', description: 'decomposition ones (should be 0)' },
+                { id: 'decomp_zero', expected: '0', description: 'decomposition ones (should be 0)' },
                 { id: 'decomp_single', expected: currentProblem.ones.toString(), description: 'decomposition single digit' }
             ];
 

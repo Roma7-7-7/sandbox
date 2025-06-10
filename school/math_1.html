@@ -218,7 +218,7 @@
             <label for="level">Choose Level:</label>
             <select id="level">
                 <option value="1">Level 1 - Two Digit + One Digit</option>
-                <option value="2">Level 2 (Coming Soon!)</option>
+                <option value="2">Level 2 - Two Digit - One Digit</option>
                 <option value="3">Level 3 (Coming Soon!)</option>
                 <option value="4">Level 4 (Coming Soon!)</option>
             </select>
@@ -269,6 +269,50 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Level 2 Structure -->
+            <div id="level2" class="level-content hidden">
+                <!-- Main equation line -->
+                <div class="equation-line">
+                    <input type="text" class="number-input readonly" id="l2_tens1" maxlength="1" readonly>
+                    <input type="text" class="number-input readonly" id="l2_ones1" maxlength="1" readonly>
+                    <span class="operator">-</span>
+                    <input type="text" class="number-input readonly" id="l2_single1" maxlength="1" readonly>
+                    <span class="operator">=</span>
+                    <input type="text" class="number-input" id="l2_tens2" maxlength="1">
+                    <input type="text" class="number-input" id="l2_ones2" maxlength="1">
+                    <span class="operator">+</span>
+                    <input type="text" class="number-input" id="l2_single2" maxlength="1">
+                    <span class="operator">-</span>
+                    <input type="text" class="number-input" id="l2_single3" maxlength="1">
+                    <span class="operator">=</span>
+                    <input type="text" class="number-input" id="l2_tens3" maxlength="1">
+                    <input type="text" class="number-input" id="l2_ones3" maxlength="1">
+                    <span class="operator">+</span>
+                    <input type="text" class="number-input" id="l2_single4" maxlength="1">
+                    <span class="operator">=</span>
+                    <input type="text" class="number-input" id="l2_result_tens" maxlength="1">
+                    <input type="text" class="number-input" id="l2_result_ones" maxlength="1">
+                </div>
+
+                <!-- Decomposition visual -->
+                <div class="decomposition-visual">
+                    <!-- Middle row: split lines -->
+                    <div style="font-size: 2em; margin-bottom: 15px; color: #666; text-align: left; font-family: monospace; line-height: 1;">
+                        &nbsp;&nbsp;/&nbsp;\
+                    </div>
+                    <!-- Bottom row: decomposed parts -->
+                    <div class="decomposition-line" style="display: flex; justify-content: center; align-items: center; gap: 60px;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="text" class="number-input" id="l2_decomp_tens" maxlength="1">
+                            <input type="text" class="number-input" id="l2_decomp_zero" maxlength="1">
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <input type="text" class="number-input" id="l2_decomp_single" maxlength="1">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="buttons">
@@ -286,6 +330,11 @@
         function setupInputNavigation() {
             const inputs = document.querySelectorAll('.number-input:not(.readonly)');
             inputs.forEach((input, index) => {
+                // Select all text when input is focused
+                input.addEventListener('focus', function(e) {
+                    e.target.select();
+                });
+                
                 input.addEventListener('input', function(e) {
                     // Only allow single digits
                     if (e.target.value.length > 1) {
@@ -352,7 +401,7 @@
             document.getElementById('single1').value = single;
 
             // Clear all user inputs
-            const userInputs = document.querySelectorAll('.number-input:not(.readonly)');
+            const userInputs = document.querySelectorAll('#level1 .number-input:not(.readonly)');
             userInputs.forEach(input => {
                 input.value = '';
                 input.classList.remove('valid', 'invalid');
@@ -364,6 +413,50 @@
 
             // Focus first input
             document.getElementById('tens2').focus();
+        }
+
+        function generateLevel2Problem() {
+            let tens, ones, single;
+            let attempts = 0;
+            
+            // Generate numbers ensuring the result is positive and no borrowing needed from tens
+            do {
+                tens = Math.floor(Math.random() * 9) + 1; // 1-9
+                ones = Math.floor(Math.random() * 9) + 1; // 1-9
+                single = Math.floor(Math.random() * ones) + 1; // Ensure ones >= single (no borrowing)
+                attempts++;
+            } while (attempts < 100 && ones < single);
+
+            const twoDigitNumber = tens * 10 + ones;
+            const result = twoDigitNumber - single;
+
+            currentProblem = {
+                tens: tens,
+                ones: ones,
+                single: single,
+                result: result,
+                resultTens: Math.floor(result / 10),
+                resultOnes: result % 10
+            };
+
+            // Fill in the read-only inputs
+            document.getElementById('l2_tens1').value = tens;
+            document.getElementById('l2_ones1').value = ones;
+            document.getElementById('l2_single1').value = single;
+
+            // Clear all user inputs
+            const userInputs = document.querySelectorAll('#level2 .number-input:not(.readonly)');
+            userInputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('valid', 'invalid');
+            });
+
+            // Clear feedback
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+
+            // Focus first input
+            document.getElementById('l2_tens2').focus();
         }
 
         function validateLevel1() {
@@ -432,11 +525,82 @@
             }
         }
 
+        function validateLevel2() {
+            const feedback = document.getElementById('feedback');
+            let allCorrect = true;
+            let errors = [];
+
+            // Calculate expected values
+            const onesMinusSingle = currentProblem.ones - currentProblem.single;
+
+            // Get user inputs
+            const userInputs = {
+                l2_tens2: document.getElementById('l2_tens2').value,
+                l2_ones2: document.getElementById('l2_ones2').value,
+                l2_single2: document.getElementById('l2_single2').value,
+                l2_single3: document.getElementById('l2_single3').value,
+                l2_tens3: document.getElementById('l2_tens3').value,
+                l2_ones3: document.getElementById('l2_ones3').value,
+                l2_single4: document.getElementById('l2_single4').value,
+                l2_result_tens: document.getElementById('l2_result_tens').value,
+                l2_result_ones: document.getElementById('l2_result_ones').value,
+                l2_decomp_tens: document.getElementById('l2_decomp_tens').value,
+                l2_decomp_zero: document.getElementById('l2_decomp_zero').value,
+                l2_decomp_single: document.getElementById('l2_decomp_single').value
+            };
+
+            // Validation logic
+            const validations = [
+                { id: 'l2_tens2', expected: currentProblem.tens.toString(), description: 'first decomposition tens' },
+                { id: 'l2_ones2', expected: '0', description: 'first decomposition ones (should be 0)' },
+                { id: 'l2_single2', expected: currentProblem.ones.toString(), description: 'separated ones digit' },
+                { id: 'l2_single3', expected: currentProblem.single.toString(), description: 'single digit to subtract' },
+                { id: 'l2_tens3', expected: currentProblem.tens.toString(), description: 'second step tens' },
+                { id: 'l2_ones3', expected: '0', description: 'second step ones (should be 0)' },
+                { id: 'l2_single4', expected: onesMinusSingle.toString(), description: 'result of ones subtraction' },
+                { id: 'l2_result_tens', expected: currentProblem.resultTens.toString(), description: 'final result tens' },
+                { id: 'l2_result_ones', expected: currentProblem.resultOnes.toString(), description: 'final result ones' },
+                { id: 'l2_decomp_tens', expected: currentProblem.tens.toString(), description: 'decomposition tens' },
+                { id: 'l2_decomp_zero', expected: '0', description: 'decomposition ones (should be 0)' },
+                { id: 'l2_decomp_single', expected: currentProblem.ones.toString(), description: 'decomposition single digit' }
+            ];
+
+            validations.forEach(validation => {
+                const input = document.getElementById(validation.id);
+                const userValue = input.value.trim();
+                
+                if (userValue === validation.expected) {
+                    input.classList.remove('invalid');
+                    input.classList.add('valid');
+                } else {
+                    input.classList.remove('valid');
+                    input.classList.add('invalid');
+                    allCorrect = false;
+                    if (userValue === '') {
+                        errors.push(`Please fill in ${validation.description}`);
+                    } else {
+                        errors.push(`${validation.description} should be ${validation.expected}, not ${userValue}`);
+                    }
+                }
+            });
+
+            // Show feedback
+            if (allCorrect) {
+                feedback.textContent = '🎉 Excellent! You mastered subtraction with place values! 🎉';
+                feedback.className = 'feedback success';
+            } else {
+                feedback.textContent = '❌ Some answers need fixing. Keep trying! ❌';
+                feedback.className = 'feedback error';
+            }
+        }
+
         // Event listeners
         document.getElementById('generateBtn').addEventListener('click', () => {
             const level = document.getElementById('level').value;
             if (level === '1') {
                 generateLevel1Problem();
+            } else if (level === '2') {
+                generateLevel2Problem();
             }
         });
 
@@ -444,13 +608,28 @@
             const level = document.getElementById('level').value;
             if (level === '1') {
                 validateLevel1();
+            } else if (level === '2') {
+                validateLevel2();
             }
         });
 
         document.getElementById('level').addEventListener('change', function() {
-            if (this.value !== '1') {
-                alert('Only Level 1 is available right now! More levels coming soon! 🚀');
+            const level1 = document.getElementById('level1');
+            const level2 = document.getElementById('level2');
+            
+            if (this.value === '1') {
+                level1.classList.remove('hidden');
+                level2.classList.add('hidden');
+                generateLevel1Problem();
+            } else if (this.value === '2') {
+                level1.classList.add('hidden');
+                level2.classList.remove('hidden');
+                generateLevel2Problem();
+            } else {
+                alert('Only Levels 1 and 2 are available right now! More levels coming soon! 🚀');
                 this.value = '1';
+                level1.classList.remove('hidden');
+                level2.classList.add('hidden');
             }
         });
 

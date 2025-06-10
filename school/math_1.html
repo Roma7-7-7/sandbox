@@ -131,9 +131,11 @@
         .decomposition-visual {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            margin: 30px 0;
+            align-items: flex-start;
+            margin: 15px 0 30px 0;
             font-size: 1.5em;
+            position: relative;
+            left: 0;
         }
 
         .decomposition-line {
@@ -227,6 +229,7 @@
             <div id="level1" class="level-content">
                 <!-- Main equation line -->
                 <div class="equation-line">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <input type="text" class="number-input readonly" id="tens1" maxlength="1" readonly>
                     <input type="text" class="number-input readonly" id="ones1" maxlength="1" readonly>
                     <span class="operator">+</span>
@@ -251,8 +254,8 @@
                 <!-- Decomposition visual -->
                 <div class="decomposition-visual">
                     <!-- Middle row: split lines -->
-                    <div style="font-size: 2em; margin: 15px 0; color: #666; text-align: left; font-family: monospace;">
-                        /&nbsp;\
+                    <div style="font-size: 2em; margin-bottom: 15px; color: #666; text-align: left; font-family: monospace; line-height: 1;">
+                        &nbsp;&nbsp;/&nbsp;\
                     </div>
                     <!-- Bottom row: decomposed parts -->
                     <div class="decomposition-line" style="display: flex; justify-content: center; align-items: center; gap: 60px;">
@@ -283,11 +286,6 @@
         function setupInputNavigation() {
             const inputs = document.querySelectorAll('.number-input:not(.readonly)');
             inputs.forEach((input, index) => {
-                // Select all text when input is focused
-                input.addEventListener('focus', function(e) {
-                    e.target.select();
-                });
-
                 input.addEventListener('input', function(e) {
                     // Only allow single digits
                     if (e.target.value.length > 1) {

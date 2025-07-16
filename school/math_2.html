@@ -198,6 +198,13 @@
             text-align: center;
             font-size: 1.1em;
             font-weight: bold;
+            -moz-appearance: textfield; /* Remove spinners in Firefox */
+        }
+
+        .exercise input::-webkit-outer-spin-button,
+        .exercise input::-webkit-inner-spin-button {
+            -webkit-appearance: none; /* Remove spinners in Chrome/Safari */
+            margin: 0;
         }
 
         .exercise input:focus {
@@ -434,9 +441,10 @@
                 exerciseDiv.innerHTML = `
                     <span>${exerciseX}</span>
                     <span>${currentOperation}</span>
-                    <input type="number" data-answer="${correctAnswer}" placeholder="?">
-                    <span>=</span>
-                    <span>${exerciseTarget}</span>
+                    <input type="text" data-answer="${correctAnswer}" placeholder="?" 
+                           oninput="validateNumericInput(this)" 
+                           onfocus="selectAllContent(this)"
+                           onkeypress="return isNumericKey(event)">
                 `;
                 
                 exerciseArea.appendChild(exerciseDiv);
@@ -518,6 +526,25 @@
                 checkAnswers();
             }
         });
+
+        // Numeric input validation functions
+        function isNumericKey(event) {
+            const char = String.fromCharCode(event.which);
+            if (!(/[0-9]/.test(char)) && event.which !== 8 && event.which !== 0) {
+                event.preventDefault();
+                return false;
+            }
+            return true;
+        }
+
+        function validateNumericInput(input) {
+            // Remove any non-numeric characters
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+        function selectAllContent(input) {
+            input.select();
+        }
     </script>
 </body>
 </html>

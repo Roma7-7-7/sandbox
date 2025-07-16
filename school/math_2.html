@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Exercise Tool</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+
+        .exercise-area {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 0 auto 30px;
+            background: #f8f9fa;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #667eea;
+        }
+
+        .target-value {
+            font-size: 4em;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .exercise {
+            position: absolute;
+            background: white;
+            padding: 10px 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .exercise:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .exercise.correct {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .exercise.incorrect {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .exercise input {
+            width: 60px;
+            padding: 5px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .exercise input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
+        }
+
+        .check-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .check-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .generate-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .generate-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .feedback {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.3em;
+            font-weight: bold;
+            min-height: 30px;
+        }
+
+        .feedback.success {
+            color: #28a745;
+        }
+
+        .feedback.error {
+            color: #dc3545;
+        }
+
+        .score {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.1em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Math Exercise</h1>
+        
+        <div class="exercise-area" id="exerciseArea">
+            <div class="target-value" id="targetValue">10</div>
+        </div>
+
+        <div class="buttons">
+            <button class="check-btn" onclick="checkAnswers()">✓ Check</button>
+            <button class="generate-btn" onclick="generateExercise()">🎲 Generate</button>
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+        <div class="score" id="score">Score: 0 / 0</div>
+    </div>
+
+    <script>
+        let currentTarget = 10;
+        let exercises = [];
+        let totalAttempts = 0;
+        let correctAnswers = 0;
+
+        function generateExercise() {
+            // Generate random target value (>= 1, minimum 2 to ensure x can be >= 1)
+            currentTarget = Math.floor(Math.random() * 20) + 2;
+            document.getElementById('targetValue').textContent = currentTarget;
+            
+            // Clear previous exercises
+            const exerciseArea = document.getElementById('exerciseArea');
+            const existingExercises = exerciseArea.querySelectorAll('.exercise');
+            existingExercises.forEach(ex => ex.remove());
+            
+            exercises = [];
+            
+            // Generate 6 exercises around the circle
+            const numExercises = 6;
+            const radius = 180;
+            
+            for (let i = 0; i < numExercises; i++) {
+                const angle = (i * 360 / numExercises) - 90; // Start from top
+                const x = Math.cos(angle * Math.PI / 180) * radius;
+                const y = Math.sin(angle * Math.PI / 180) * radius;
+                
+                // Generate random x value (>= 1, but <= currentTarget to ensure y >= 0)
+                const xValue = Math.floor(Math.random() * currentTarget) + 1;
+                const correctAnswer = currentTarget - xValue;
+                
+                const exerciseDiv = document.createElement('div');
+                exerciseDiv.className = 'exercise';
+                exerciseDiv.style.left = `calc(50% + ${x}px)`;
+                exerciseDiv.style.top = `calc(50% + ${y}px)`;
+                exerciseDiv.style.transform = 'translate(-50%, -50%)';
+                
+                exerciseDiv.innerHTML = `
+                    <span>${xValue}</span>
+                    <span>+</span>
+                    <input type="number" data-answer="${correctAnswer}" placeholder="?">
+                    <span>=</span>
+                    <span>${currentTarget}</span>
+                `;
+                
+                exerciseArea.appendChild(exerciseDiv);
+                exercises.push({
+                    element: exerciseDiv,
+                    xValue: xValue,
+                    correctAnswer: correctAnswer
+                });
+            }
+            
+            // Clear feedback
+            document.getElementById('feedback').textContent = '';
+            
+            // Reset exercise styles
+            exercises.forEach(ex => {
+                ex.element.className = 'exercise';
+            });
+        }
+
+        function checkAnswers() {
+            let allCorrect = true;
+            let answeredCount = 0;
+            
+            exercises.forEach(exercise => {
+                const input = exercise.element.querySelector('input');
+                const userAnswer = parseInt(input.value);
+                
+                if (input.value.trim() === '') {
+                    exercise.element.className = 'exercise';
+                    return;
+                }
+                
+                answeredCount++;
+                
+                if (userAnswer === exercise.correctAnswer) {
+                    exercise.element.className = 'exercise correct';
+                } else {
+                    exercise.element.className = 'exercise incorrect';
+                    allCorrect = false;
+                }
+            });
+            
+            const feedback = document.getElementById('feedback');
+            
+            if (answeredCount === 0) {
+                feedback.textContent = 'Please fill in at least one answer!';
+                feedback.className = 'feedback error';
+                return;
+            }
+            
+            if (allCorrect && answeredCount === exercises.length) {
+                feedback.textContent = '🎉 Excellent! All answers are correct!';
+                feedback.className = 'feedback success';
+                correctAnswers++;
+            } else {
+                const correctCount = exercises.filter(ex => 
+                    ex.element.classList.contains('correct')
+                ).length;
+                feedback.textContent = `${correctCount} out of ${answeredCount} correct. Keep trying!`;
+                feedback.className = 'feedback error';
+            }
+            
+            totalAttempts++;
+            updateScore();
+        }
+
+        function updateScore() {
+            const score = document.getElementById('score');
+            score.textContent = `Score: ${correctAnswers} / ${totalAttempts}`;
+        }
+
+        // Initialize with first exercise
+        generateExercise();
+
+        // Allow Enter key to check answers
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswers();
+            }
+        });
+    </script>
+</body>
+</html>

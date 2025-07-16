@@ -4,6 +4,81 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Math Exercise Tool</title>
+    
+    <!-- 
+    PROJECT METADATA FOR AI EVOLUTION:
+    
+    PURPOSE: Interactive math exercise generator for elementary students
+    
+    ARCHITECTURE:
+    - Central circular layout with target number (z) in center
+    - 6 exercises positioned around circle using polar coordinates
+    - Each exercise format: "x [operation] ? = z" where user fills missing operand
+    - Real-time validation with visual feedback (green/red styling)
+    - Score tracking and progress monitoring
+    
+    CURRENT CONSTRAINTS:
+    - Operation: Addition only (+ operator)
+    - x values: Positive integers >= 1, <= z (ensures valid solutions)
+    - z values: Target numbers 2-21 (ensures z >= x for positive solutions)
+    - Missing value (y): Always positive (y = z - x)
+    
+    EXTENSIBILITY PLANNED:
+    - Support for subtraction (-), multiplication (*), division (/) operations
+    - Operation-specific constraint logic needed:
+      * Subtraction: ensure x <= z for positive results
+      * Multiplication: ensure z % x == 0 for integer division
+      * Division: ensure z is multiple of x for clean division
+    
+    KEY FUNCTIONS:
+    - generateExercise(): Creates new problem set with random target and operands
+    - checkAnswers(): Validates user input and provides feedback
+    - Polar coordinate positioning for circular layout
+    
+    STYLING: Modern gradient design with hover effects, responsive layout
+    
+    EDUCATIONAL FEATURES:
+    - Immediate feedback with color coding
+    - Score tracking for progress monitoring
+    - Engaging visual design to maintain student interest
+    - Enter key support for quick answer checking
+    
+    TECHNICAL NOTES:
+    - Pure HTML/CSS implementation
+    - No external dependencies
+    - Uses transform positioning for exercise placement
+    - Event-driven validation system
+    
+    CRITICAL INSTRUCTION FOR AI MODIFICATIONS:
+    When making ANY changes to this codebase, you MUST:
+    1. Update this metadata block to accurately reflect ALL modifications
+    2. Modify constraint descriptions if mathematical rules change
+    3. Update function descriptions if behavior changes
+    4. Add new features to the extensibility or educational sections
+    5. Revise architecture notes if layout/structure changes
+    6. Update styling notes if visual changes are made
+    7. Modify technical notes if dependencies or implementation approach changes
+    8. Ensure this metadata remains the definitive source of truth for the project
+    
+    CURRENT STATE CHECKSUM:
+    - Exercise count: 6 fixed exercises per generation
+    - Target range: 2-21 (Math.floor(Math.random() * 20) + 2)
+    - X value range: 1 to currentTarget (Math.floor(Math.random() * currentTarget) + 1)
+    - Operations supported: Addition (+) only
+    - Layout: Circular with 180px radius, starting angle -90° (top)
+    - Input validation: Number type, compares with (currentTarget - xValue)
+    - Score system: correctAnswers / totalAttempts
+    - Feedback system: Color-coded (green=correct, red=incorrect)
+    - Keyboard support: Enter key triggers checkAnswers()
+    - Visual feedback: Hover effects, transform animations
+    
+    VERSION HISTORY:
+    - v1.0: Initial creation with negative x values
+    - v1.1: Changed to positive x values (x >= 1), adjusted target range
+    - v1.2: Added comprehensive AI metadata documentation
+    -->
+
+</head>
     <style>
         body {
             font-family: 'Arial', sans-serif;

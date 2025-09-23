@@ -283,11 +283,11 @@
                 <input type="radio" name="operation" value="+" checked onchange="onOperationChange()">
                 <span>➕ Addition</span>
             </label>
+            <!-- Temporarily hidden - will be enabled later
             <label class="operation-option">
                 <input type="radio" name="operation" value="-" onchange="onOperationChange()">
                 <span>➖ Subtraction</span>
             </label>
-            <!-- Temporarily hidden - will be enabled later
             <label class="operation-option">
                 <input type="radio" name="operation" value="*" onchange="onOperationChange()">
                 <span>✖️ Multiplication</span>
@@ -322,11 +322,42 @@
         // Operation-specific constraints and logic
         const operationConstraints = {
             '+': {
-                getTargetRange: () => ({ min: 2, max: 21 }),
-                getXRange: (target) => ({ min: 1, max: target }),
-                isValidCombination: (x, target) => x <= target,
-                generateValidTarget: () => Math.floor(Math.random() * 20) + 2,
-                generateValidX: (target) => Math.floor(Math.random() * target) + 1
+                getTargetRange: () => ({ min: 5, max: 99 }),
+                getXRange: (target) => ({ min: 1, max: target - 1 }),
+                isValidCombination: (x, target) => {
+                    if (x >= target) return false; // y must be > 0
+                    
+                    const y = target - x;
+                    if (y <= 0) return false;
+                    
+                    if (target <= 9) {
+                        return true; // No extra conditions for single digit z
+                    }
+                    
+                    // For two-digit z = ab
+                    const onesDigitZ = target % 10;
+                    
+                    if (y <= 9) {
+                        // If y has 1 digit: y <= b
+                        return y <= onesDigitZ;
+                    } else {
+                        // If y has 2 digits like y = de: e < b
+                        const onesDigitY = y % 10;
+                        return onesDigitY < onesDigitZ;
+                    }
+                },
+                generateValidTarget: () => Math.floor(Math.random() * 95) + 5,
+                generateValidX: (target) => {
+                    let attempts = 0;
+                    let x;
+                    
+                    do {
+                        x = Math.floor(Math.random() * (target - 1)) + 1;
+                        attempts++;
+                    } while (!operationConstraints['+'].isValidCombination(x, target) && attempts < 100);
+                    
+                    return x;
+                }
             },
             '-': {
                 getTargetRange: () => ({ min: 1, max: 20 }),

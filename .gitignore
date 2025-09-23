@@ -25,3 +25,5 @@ go.work
 *vendor/
 
 *.DS_Store
+
+.vscode/
